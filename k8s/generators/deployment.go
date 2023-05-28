@@ -11,8 +11,10 @@ import (
 	"github.com/nathanbrophy/portfolio-demo/k8s/utils"
 )
 
+// DeploymentGeneratorV1 implemented the Generator interface for the deployment k8s manifest type
 type DeploymentGeneratorV1 struct{}
 
+// Object will generate the reconciled service from the expected cluster state
 func (d *DeploymentGeneratorV1) Object(in acmeapi.Application) client.Object {
 	// The labels from generation need to be merged
 	// so that the resulting Pod template has a valid

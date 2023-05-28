@@ -8,8 +8,16 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
+// DriftDetectionFunc defines the function family used to determine if drift exists on the cluster or not
+// takes in two objects as input:
+//
+//	in: The object we have reconciled from the desired cluster state
+//	out: The object that already exists on the cluster we must reconcile againse
+//
+// and perform a deep comparision on thetwo objects to determine if any such drift exists
 type DriftDetectionFunc func(in, out client.Object) bool
 
+// Deployment implements DriftDetectionFunc for the deployment resource
 func Deployment(in, out client.Object) bool {
 	lhs := in.(*appsv1.Deployment)
 	rhs := out.(*appsv1.Deployment)
@@ -22,6 +30,7 @@ func Deployment(in, out client.Object) bool {
 	return drift
 }
 
+// Service implements DriftDetectionFunc for the Service resource
 func Service(in, out client.Object) bool {
 	lhs := in.(*corev1.Service)
 	rhs := out.(*corev1.Service)
@@ -32,6 +41,7 @@ func Service(in, out client.Object) bool {
 	return drift
 }
 
+// ServiceAccount implements DriftDetectionFunc for the ServiceAccount resource
 func ServiceAccount(in, out client.Object) bool {
 	lhs := in.(*corev1.ServiceAccount)
 	rhs := out.(*corev1.ServiceAccount)

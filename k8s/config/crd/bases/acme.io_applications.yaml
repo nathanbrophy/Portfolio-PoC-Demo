@@ -36,29 +36,45 @@ spec:
             description: ApplicationSpec defines the desired state of Application
             properties:
               application:
+                description: Application defines the application specific information
+                  to use in reconciliation
                 properties:
                   image:
+                    description: Image defines the FQDN / Pull Location for the container
+                      image to run and is required
                     type: string
                   port:
+                    description: Port is the port to expose from the container
                     format: int32
                     type: integer
                   replicas:
+                    description: Replicas is the number of replicas to run for the
+                      downstream deployment
                     format: int32
                     type: integer
                 required:
                 - image
                 type: object
               boilerPlate:
+                description: BoilerPlate defines bootstrap / helpful information and
+                  metadata to be used and is not tied directly to the application
                 properties:
                   imagePullSecrets:
+                    description: ImagePullSecrets is an array of pull secrets to bind
+                      to the generated service account
                     items:
                       type: string
                     type: array
                   namePrefix:
+                    description: NamePrefix allows the resource name generation to
+                      be overriden, and can be derived when not present
                     type: string
                   serviceAccount:
+                    description: ServiceAccount is an optional flag to define the
+                      name of the service account to generate
                     type: string
                   version:
+                    description: Version defines the version for the static k8s labels
                     type: string
                 type: object
             required:

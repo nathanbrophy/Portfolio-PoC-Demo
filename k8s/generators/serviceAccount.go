@@ -8,8 +8,10 @@ import (
 	acmeapi "github.com/nathanbrophy/portfolio-demo/k8s/api"
 )
 
+// ServiceAccountGeneratorV1 implemented the Generator interface for the service account k8s manifest type
 type ServiceAccountGeneratorV1 struct{}
 
+// Object will generate the reconciled serviceAccount from the expected cluster state
 func (s *ServiceAccountGeneratorV1) Object(in acmeapi.Application) client.Object {
 	pullSecrets := in.ImagePullSecrets()
 	lors := make([]corev1.LocalObjectReference, len(pullSecrets))

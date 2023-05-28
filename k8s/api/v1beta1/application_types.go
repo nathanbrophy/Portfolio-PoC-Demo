@@ -31,17 +31,37 @@ const (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
+// ApplicationBoilerPlate defines a set of boilder plate information that is useful across all reconciliation steps
 type ApplicationBoilerPlate struct {
-	ServiceAccount   *string  `json:"serviceAccount,omitempty"`
+	// ServiceAccount is an optional flag to define the name of the service account to generate
+	//+optional
+	ServiceAccount *string `json:"serviceAccount,omitempty"`
+
+	// ImagePullSecrets is an array of pull secrets to bind to the generated service account
+	//+optional
 	ImagePullSecrets []string `json:"imagePullSecrets,omitempty"`
-	NamePrefix       *string  `json:"namePrefix,omitempty"`
-	Version          *string  `json:"version,omitempty"`
+
+	// NamePrefix allows the resource name generation to be overriden, and can be derived when not present
+	//+optional
+	NamePrefix *string `json:"namePrefix,omitempty"`
+
+	// Version defines the version for the static k8s labels
+	//+optional
+	Version *string `json:"version,omitempty"`
 }
 
+// ApplicationApplication defines information that is used to deploy the application itself and ensure it can run on the cluster environment
 type ApplicationApplication struct {
-	Image    *string `json:"image"`
-	Replicas *int32  `json:"replicas,omitempty"`
-	Port     *int32  `json:"port,omitempty"`
+	// Image defines the FQDN / Pull Location for the container image to run and is required
+	Image *string `json:"image"`
+
+	// Replicas is the number of replicas to run for the downstream deployment
+	//+optional
+	Replicas *int32 `json:"replicas,omitempty"`
+
+	// Port is the port to expose from the container
+	//++optional
+	Port *int32 `json:"port,omitempty"`
 }
 
 // ApplicationSpec defines the desired state of Application
@@ -49,7 +69,10 @@ type ApplicationSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
+	// Application defines the application specific information to use in reconciliation
 	Application *ApplicationApplication `json:"application"`
+
+	// BoilerPlate defines bootstrap / helpful information and metadata to be used and is not tied directly to the application
 	BoilerPlate *ApplicationBoilerPlate `json:"boilerPlate,omitempty"`
 }
 
@@ -79,6 +102,14 @@ type ApplicationList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []Application `json:"items"`
 }
+
+/**
+ *
+ * Star method API design function implementations
+ * please reference the api.go package for complete documentation
+ * on what each of the delta point functions completes.
+ *
+ */
 
 func (a *Application) Replicas() *int32 {
 	if a == nil || a.Spec.Application == nil || a.Spec.Application.Replicas == nil {
@@ -143,6 +174,7 @@ func (a *Application) Instancer() *string {
 	return acmeioutils.StringPointerGenerator(uuid[:truncMax])
 }
 
+// Reduired in order to interact with the control plane
 func init() {
 	SchemeBuilder.Register(&Application{}, &ApplicationList{})
 }

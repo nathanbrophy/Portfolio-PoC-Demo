@@ -15,10 +15,13 @@ var (
 	DefaultServiceAccountGenerator Generator = &ServiceAccountGeneratorV1{}
 )
 
+// Generator is an interface typing that defines the methods required for any object to be reconciled and deployed to the cluster
 type Generator interface {
+	// Object is a method that will reconcile the expected state defined in the CR to render a k8s manifest
 	Object(acmeapi.Application) client.Object
 }
 
+// labelsGenerator will generate a static set of labels for the downstream resouces, this method is idempotent
 func labelsGenerator(in acmeapi.Application) map[string]string {
 	return map[string]string{
 		"app.kubernetes.io/name":       *in.Name(),
@@ -29,6 +32,7 @@ func labelsGenerator(in acmeapi.Application) map[string]string {
 	}
 }
 
+// generateAppSelector will generate the app selector for the service and deployment resources
 func generateAppSelector(in acmeapi.Application) *metav1.LabelSelector {
 	return &metav1.LabelSelector{
 		MatchLabels: map[string]string{
@@ -37,6 +41,7 @@ func generateAppSelector(in acmeapi.Application) *metav1.LabelSelector {
 	}
 }
 
+// generateContainerPorts is a utility wrapper that generates the container ports for the service adoption
 func generateContainerPorts(in acmeapi.Application) []corev1.ContainerPort {
 	return []corev1.ContainerPort{
 		{

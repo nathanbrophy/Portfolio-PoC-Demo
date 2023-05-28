@@ -9,8 +9,10 @@ import (
 	acmeapi "github.com/nathanbrophy/portfolio-demo/k8s/api"
 )
 
+// ServiceGeneratorV1 implemented the Generator interface for the service k8s manifest type
 type ServiceGeneratorV1 struct{}
 
+// Object will generate the reconciled service from the expected cluster state
 func (s *ServiceGeneratorV1) Object(in acmeapi.Application) client.Object {
 	generated := &corev1.Service{
 		TypeMeta: metav1.TypeMeta{
