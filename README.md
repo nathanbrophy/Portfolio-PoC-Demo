@@ -55,6 +55,8 @@ When running the PoC the following items will be installed:
       1. 2 private
       2. 2 public
    4. Security IAM groups and bindings allowing resource connectivity 
+   5. TLS certificates for the cluster connection
+   6. Cloudwatch log groups
 2. An operator controller image that is built and pushed to a docker repository with anonymous pull 
    1. Can be skipped if `deploy.no_build` is set to a truthy value in the config file
 3. An operator controller image is deployed to the running environment
