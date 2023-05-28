@@ -128,7 +128,7 @@ func (a *Application) Image() string {
 }
 
 func (a *Application) Port() *int32 {
-	if a == nil || a.Spec.Application == nil {
+	if a == nil || a.Spec.Application == nil || a.Spec.Application.Port == nil {
 		return acmeioutils.Int32PointerGenerator(8081)
 	}
 
@@ -160,7 +160,7 @@ func (a *Application) Name() *string {
 }
 
 func (a *Application) Version() *string {
-	if a == nil || a.Spec.BoilerPlate == nil || a.Spec.BoilerPlate.NamePrefix == nil {
+	if a == nil || a.Spec.BoilerPlate == nil || a.Spec.BoilerPlate.Version == nil {
 		return acmeioutils.StringPointerGenerator(VERSION)
 	}
 
