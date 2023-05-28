@@ -145,6 +145,8 @@ To run the unit tests for the package perform the following:
 
 To run the e2e test suite for the package perform the following:
 
+> NOTE: `minikube` is a prerequisite for this test, as we stand up an ephemeral, local k8s cluster to perform tests on, as to not potentially conflict with a production environment. 
+
 ```
 % cd k8s/test_e2e.sh
 
