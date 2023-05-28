@@ -1,0 +1,14 @@
+apiVersion: acme.io/v1beta1
+kind: Application
+metadata:
+  labels:
+    app.kubernetes.io/name: application
+    app.kubernetes.io/instance: application-sample
+    app.kubernetes.io/part-of: k8s
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: k8s
+  name: application-sample
+spec:
+  application:
+    image: "registry.hub.docker.com/nathanbrophy/example-server:v1.0.0"
+    port: 8081
