@@ -35,7 +35,7 @@ function verify_requisite {
 }
 
 function check_prereqs {
-    local reqs=(minikube docker go kubectl terraform yq aws)
+    local reqs=(docker go kubectl terraform yq aws)
     for r in "${reqs[@]}"; do 
         verify_requisite "${r}"
     done
@@ -128,7 +128,9 @@ function infrastructure {
     echo "Conintue [y/N]: "
     read CONTINUE
 
-    [[ "${CONTINUE}" != "y" ]] && fatal "user did not accept the terraform plan, canceling apply"
+    [[ "${CONTINUE}" != "y" ]] && error "user did not accept the terraform plan, canceling apply"
+
+    [[ "${CRITICAL_ERROR}" -eq 1 ]] && exit 1
 
     terraform apply -var region="${region}" -var cluster_name="${cluster_name}" -auto-approve
 
