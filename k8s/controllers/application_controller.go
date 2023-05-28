@@ -18,6 +18,8 @@ package controllers
 
 import (
 	"context"
+	"fmt"
+	"reflect"
 	"time"
 
 	appsv1 "k8s.io/api/apps/v1"
@@ -55,8 +57,41 @@ func gvk(obj client.Object) schema.GroupVersionKind {
 func (r *ApplicationReconciler) updateStatus(
 	logger logr.Logger,
 	ctx context.Context,
+	req ctrl.Request,
+	progressing bool,
 	err error,
 ) error {
+	found := &acmeiov1beta1.Application{}
+	_ = r.Client.Get(ctx, client.ObjectKey{Namespace: req.Namespace, Name: req.Name}, found)
+
+	newStatus := found.Status.DeepCopy()
+
+	newStatus.Progressing = progressing
+	newStatus.Reason = "reconciling cluster state"
+
+	if !progressing {
+		newStatus.Reason = "completed"
+	}
+
+	if err != nil {
+		newStatus.Progressing = false
+		newStatus.Reason = fmt.Sprintf("failed to reconcile cluster state due to error: %v", err)
+	}
+
+	// A deep equal reflection is required to prevent an infinite reconciliation loop from occuring.
+	//
+	// Since the status is managed as a subresource of the API we are required to access it
+	// through the subresource .Status() mutator to propogate changes.
+	if !reflect.DeepEqual(found.Status, *newStatus) {
+		found.Status = *newStatus
+		if err := r.Status().Update(ctx, found); err != nil {
+			if errors.IsTooManyRequests(err) || errors.IsConflict(err) {
+				return nil
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -113,6 +148,10 @@ func (r *ApplicationReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		},
 	}
 
+	if err := r.updateStatus(reconcileLogger, ctx, req, true, nil); err != nil {
+		return ctrl.Result{RequeueAfter: time.Second * 5}, err
+	}
+
 	for _, reconcilers := range toReconcile {
 		// Set the namespace for the generated manifest to
 		// the namespace for the reconciling CR
@@ -151,6 +190,9 @@ func (r *ApplicationReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 				if err := r.Client.Get(ctx, client.ObjectKeyFromObject(found), found); err != nil {
 					// We cannot determine if drift exists or not if we cannot
 					// grab the current object state from the cluster.
+					if err := r.updateStatus(reconcileLogger, ctx, req, false, err); err != nil {
+						return ctrl.Result{RequeueAfter: time.Second * 5}, err
+					}
 					return ctrl.Result{RequeueAfter: time.Second * 5}, err
 				}
 				if !reconcilers.Driftor(reconcilers.Manifest, found) {
@@ -165,13 +207,23 @@ func (r *ApplicationReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 					// there is drift that cannot be recovered from, meaning the
 					// current cluster state is not valid to the CR definition
 					reconcileLogger.Error(err, "unable to update object to restore expected cluster state")
+					if err := r.updateStatus(reconcileLogger, ctx, req, false, err); err != nil {
+						return ctrl.Result{RequeueAfter: time.Second * 5}, err
+					}
 					return ctrl.Result{RequeueAfter: time.Second * 5}, err
 				}
 			} else {
 				reconcileLogger.Error(err, "unable to create require downstream manifest to support application deployment")
+				if err := r.updateStatus(reconcileLogger, ctx, req, false, err); err != nil {
+					return ctrl.Result{RequeueAfter: time.Second * 5}, err
+				}
 				return ctrl.Result{RequeueAfter: time.Second * 5}, err
 			}
 		}
+	}
+
+	if err := r.updateStatus(reconcileLogger, ctx, req, false, nil); err != nil {
+		return ctrl.Result{RequeueAfter: time.Second * 5}, err
 	}
 
 	return ctrl.Result{}, nil

@@ -5,6 +5,16 @@ set -e
 VERSION="v1.0.0"
 CRITICAL_ERROR=0
 ROOT_DIR=`pwd`
+_SKIP_BUILD="$(cat deploy_config.yaml | yq -Mr '.deploy.no_build')"
+
+function build_and_push {
+    printf "${_SKIP_BUILD}" | grep '[tT][rR][uU][eE]' > /dev/null && return
+
+    cmd="make docker-build ${1}"
+    eval "${cmd}"
+    cmd="make docker-push  ${1}"
+    eval "${cmd}"
+}
 
 function info {
     log "INFO" "${1}"
@@ -45,10 +55,7 @@ function server {
 
     cd server
 
-    cmd="make docker-build ${make_flags}"
-    eval "${cmd}"
-    cmd="make docker-push  ${make_flags}"
-    eval "${cmd}"
+    build_and_push "${make_flags}"
 
     cd "${ROOT_DIR}"
 }
@@ -69,10 +76,7 @@ function controller {
 
     cd k8s
 
-    cmd="make docker-build ${make_flags}"
-    eval "${cmd}"
-    cmd="make docker-push  ${make_flags}"
-    eval "${cmd}"
+    build_and_push "${make_flags}"
 
     info "installing CRDs to cluster"
 

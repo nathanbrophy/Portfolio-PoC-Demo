@@ -22,7 +22,7 @@ import (
 
 const (
 	NIL     string = "<nil>"
-	MESSAGE string = "Automate Everything"
+	MESSAGE string = "Automate all the things!"
 )
 
 // AutomateEverything is the type the server exposes as a RESTful accessor

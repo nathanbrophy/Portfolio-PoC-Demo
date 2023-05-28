@@ -80,6 +80,12 @@ type ApplicationSpec struct {
 type ApplicationStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+
+	// Progressing defines if the install is currently in progress or completed
+	Progressing bool `json:"progressing"`
+
+	// Reason defines why progressing is true or false
+	Reason string `json:"reason"`
 }
 
 //+kubebuilder:object:root=true

@@ -2,6 +2,7 @@ deploy:
   registry: registry.hub.docker.com
   os: linux
   arch: amd64
+  no_build: false
   server:
     repository: "nathanbrophy/example-server"
     tag: "v1.0.0"
