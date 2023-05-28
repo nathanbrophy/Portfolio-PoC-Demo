@@ -45,6 +45,8 @@ Server contains the code needed to standup an example REST server container that
 
 Please read [the prerequisites](#prerequisites) before installing the application. 
 
+![](./images/poc_run.gif)
+
 To run the PoC sample the [deploy_config.yaml](./deploy_config.yaml) __must__ be configured to provide script configuration options.  Once the configuration is completed, the [deploy_poc.sh](./deploy_poc.sh) script can be ran to fully stand the PoC up on a public cloud environment. 
 
 Before running the PoC please ensure the following credential steps are taken:
