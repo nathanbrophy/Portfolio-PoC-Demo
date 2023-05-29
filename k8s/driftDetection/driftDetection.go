@@ -5,6 +5,7 @@ import (
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	networkingv1 "k8s.io/api/networking/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -47,4 +48,12 @@ func ServiceAccount(in, out client.Object) bool {
 	rhs := out.(*corev1.ServiceAccount)
 
 	return !reflect.DeepEqual(lhs.ImagePullSecrets, rhs.ImagePullSecrets)
+}
+
+// Ingress implements DriftDetectionFunc for the ServiceAccount resource
+func Ingress(in, out client.Object) bool {
+	lhs := in.(*networkingv1.Ingress)
+	rhs := out.(*networkingv1.Ingress)
+
+	return !reflect.DeepEqual(lhs.Spec.Rules, rhs.Spec.Rules)
 }

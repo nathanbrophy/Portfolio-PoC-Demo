@@ -8,6 +8,7 @@ import (
 	acmetest "github.com/nathanbrophy/portfolio-demo/k8s/utils/test"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	networkingv1 "k8s.io/api/networking/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -225,6 +226,86 @@ func TestServiceAccount(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := ServiceAccount(tt.args.in, tt.args.out); got != tt.want {
 				t.Errorf("ServiceAccount() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestIngress(t *testing.T) {
+	pType := networkingv1.PathType("Prefix")
+	generated := &networkingv1.Ingress{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "Ingress",
+			APIVersion: "networking.k8s.io/v1",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:   "example",
+			Labels: acmetest.DefaultMatchLabels(),
+			Annotations: map[string]string{
+				"alb.ingress.kubernetes.io/scheme":      "internet-facing",
+				"alb.ingress.kubernetes.io/target-type": "ip",
+			},
+		},
+		Spec: networkingv1.IngressSpec{
+			IngressClassName: acmeioutils.StringPointerGenerator("alb"),
+			Rules: []networkingv1.IngressRule{
+				{
+					IngressRuleValue: networkingv1.IngressRuleValue{
+						HTTP: &networkingv1.HTTPIngressRuleValue{
+							Paths: []networkingv1.HTTPIngressPath{
+								{
+									Path:     "/",
+									PathType: &pType,
+									Backend: networkingv1.IngressBackend{
+										Service: &networkingv1.IngressServiceBackend{
+											Name: "example",
+											Port: networkingv1.ServiceBackendPort{
+												Number: *acmeioutils.Int32PointerGenerator(8081),
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	copy := generated.DeepCopy()
+	copy.Spec.Rules[0].HTTP.Paths[0].Backend.Service.Port.Number = *acmeioutils.Int32PointerGenerator(9091)
+
+	type args struct {
+		in  client.Object
+		out client.Object
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "deafult match",
+			args: args{
+				in:  generated,
+				out: generated,
+			},
+			want: false,
+		},
+		{
+			name: "deafult do not match",
+			args: args{
+				in:  generated,
+				out: copy,
+			},
+			want: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Ingress(tt.args.in, tt.args.out); got != tt.want {
+				t.Errorf("Ingress() = %v, want %v", got, tt.want)
 			}
 		})
 	}

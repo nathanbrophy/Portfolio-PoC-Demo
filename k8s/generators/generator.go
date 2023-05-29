@@ -13,6 +13,7 @@ var (
 	DefaultDeploymentGenerator     Generator = &DeploymentGeneratorV1{}
 	DefaultServiceGenerator        Generator = &ServiceGeneratorV1{}
 	DefaultServiceAccountGenerator Generator = &ServiceAccountGeneratorV1{}
+	DefaultIngressGenerator        Generator = &IngressGeneratorV1{}
 )
 
 // Generator is an interface typing that defines the methods required for any object to be reconciled and deployed to the cluster

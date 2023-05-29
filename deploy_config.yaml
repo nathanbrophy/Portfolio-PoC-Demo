@@ -2,6 +2,7 @@ deploy:
   registry: registry.hub.docker.com
   os: linux
   arch: amd64
+  namespace: default
   no_build: true
   server:
     repository: "nathanbrophy/example-server"
@@ -10,5 +11,7 @@ deploy:
     repository: "nathanbrophy/example-controller"
     tag: "v1.0.0"
   terraform: 
-    cluster_name: "exampleCluster2"
+    cluster_name: "exampleCluster20230528567"
     region: "us-west-1"
+  load_balancer:
+    deploy: true
