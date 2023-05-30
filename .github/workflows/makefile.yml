@@ -13,8 +13,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Install dependencies
-      run: make
-
     - name: Run terraform lint
       run: make tf-lint
+
+    - name: run v2
+      run: ./infrastructure/aws/lint
