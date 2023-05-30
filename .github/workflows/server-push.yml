@@ -19,6 +19,6 @@ jobs:
         - name: Build the Docker image
           run: |
             cd server 
-            docker login -u ${DOCKER_ID} --password-stdin ${DOCKER_PASS}
+            printf ${DOCKER_PASS} | docker login -u ${DOCKER_ID} --password-stdin 
             make docker-build VERSION=${version}
             make docker-push VERSION=${version}
