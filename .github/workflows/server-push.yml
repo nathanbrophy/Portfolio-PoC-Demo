@@ -5,7 +5,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-    build:
+    build_and_push:
         runs-on: ubuntu-latest
         env:
             # Version is hard coded at the moment, in the future we should

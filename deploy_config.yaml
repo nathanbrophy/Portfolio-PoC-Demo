@@ -13,5 +13,3 @@ deploy:
   terraform: 
     cluster_name: "exampleCluster20230528567"
     region: "us-west-1"
-  load_balancer:
-    deploy: false

@@ -5,7 +5,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  infrastructure-plan:
+  infrastructure-apply:
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -17,6 +17,7 @@ jobs:
     - name: terraform apply
       run: |
         cd ./infrastructure/aws 
+        terraform init
         terraform apply -var region="${region}" -var cluster_name="${cluster_name}" -auto-approve 
   
 
