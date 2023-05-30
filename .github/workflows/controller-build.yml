@@ -1,4 +1,4 @@
-name: Docker server compilation test
+name: Docker controller compilation test
 
 # This is here to only test compilation on builds.
 
@@ -25,4 +25,4 @@ jobs:
           run: |
             cd k8s 
             printf ${DOCKER_PASS} | docker login -u ${DOCKER_ID} --password-stdin
-            make docker-build IMG=${version}
+            make docker-build IMG=${IMG}
