@@ -14,6 +14,7 @@ jobs:
             version: "v1.0.0"
             DOCKER_ID: ${{ secrets.DOCKER_ID }}
             DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
+            RUN_SERVER_TESTS: false
         steps:
         - uses: actions/checkout@v3
         - name: Build the Docker image

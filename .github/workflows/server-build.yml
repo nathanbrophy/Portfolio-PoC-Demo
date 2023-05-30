@@ -4,8 +4,9 @@ name: Docker server compilation test
 
 on:
     push:
+        branches: [ '!main' ]
     pull_request:
-      branches: [ "main" ]
+        branches: [ "main" ]
 
 jobs:
     build:
@@ -17,6 +18,7 @@ jobs:
             version: "v1.0.0"
             DOCKER_ID: ${{ secrets.DOCKER_ID }}
             DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
+            RUN_SERVER_TESTS: true
         steps:
         - uses: actions/checkout@v3
         - name: Build the Docker image

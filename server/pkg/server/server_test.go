@@ -21,6 +21,8 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
+	"strconv"
 	"sync"
 	"testing"
 
@@ -40,6 +42,10 @@ func TestServerStartupAndShutdown(t *testing.T) {
 // This serves as an e2e test
 func TestHandler(t *testing.T) {
 	localAddr := "http://:8081"
+
+	if ok, _ := strconv.ParseBool(os.Getenv("RUN_SERVER_TESTS")); !ok {
+		t.Skipf("TestHandler is skipped due to env settings.")
+	}
 
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
