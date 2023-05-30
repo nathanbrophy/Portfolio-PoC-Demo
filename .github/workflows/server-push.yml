@@ -1,0 +1,25 @@
+name: Docker build and push server
+
+on:
+  push: 
+    branches: [ "main" ]
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        env:
+            # Version is hard coded at the moment, in the future we should
+            # use git API to dynamically get the latest tag ref to auto tag the
+            # image.
+            version: "v1.0.0"
+            DOCKER_ID: ${{ secrets.DOCKER_ID }}
+            DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
+            RUN_SERVER_TESTS: false
+        steps:
+        - uses: actions/checkout@v3
+        - name: Build the Docker image
+          run: |
+            cd server 
+            printf ${DOCKER_PASS} | docker login -u ${DOCKER_ID} --password-stdin 
+            make docker-build VERSION=${version}
+            make docker-push VERSION=${version}

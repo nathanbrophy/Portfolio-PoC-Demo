@@ -4,7 +4,7 @@ OS ?= $(uname -s)
 ARCH ?= $(uname -p)
 VERSION ?= v1.0.0
 IMAGE_REPO ?= nathanbrophy/example-server
-IMAGE_REGISTRY ?= docker.io
+IMAGE_REGISTRY ?= registry.hub.docker.com
 
 IMAGE_TAG = $(IMAGE_REGISTRY)/$(IMAGE_REPO):$(VERSION)
 
