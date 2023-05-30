@@ -13,8 +13,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: run v2
+      run: ./infrastructure/aws/lint
+
     - name: Run terraform lint
       run: make tf-lint
 
-    - name: run v2
-      run: ./infrastructure/aws/lint
