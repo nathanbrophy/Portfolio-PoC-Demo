@@ -2,36 +2,54 @@
 # See: https://circleci.com/docs/configuration-reference
 version: 2.1
 
-orbs:
-  terraform: circleci/terraform@3.2
+# orbs:
+#   terraform: circleci/terraform@3.2
+
+jobs:
+  plan-apply:
+    working_directory: /tmp/project
+    docker:
+      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
+    steps:
+    - checkout
+    - run:
+        name: "init and plan"
+        command: |
+          terraform init -input=false
+          terraform validate
+          terraform plan 
+
   
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
 workflows:
-  # Workflow definition to fmt, validate and plan the TF release per commit.
-  # The manually approval flow for the build here is carried by only allowing
-  # the apply to be ran when the PR is approved and merged to the main branch.
   infrastructure:
     jobs:
-      - terraform/fmt:
-          checkout: true
-          context: terraform
-      - terraform/validate:
-          checkout: true
-          context: terraform
-          requires:
-            - terraform/fmt
-      - terraform/plan:
-          checkout: true
-          context: terraform
-          persist-workspace: true
-          requires:
-            - terraform/validate
-      - terraform/apply:
-          attach-workspace: true
-          context: terraform
-          filters:
-            branches:
-              only: main
-          requires:
-            - terraform/plan
+    - plan-apply
+  # # Workflow definition to fmt, validate and plan the TF release per commit.
+  # # The manually approval flow for the build here is carried by only allowing
+  # # the apply to be ran when the PR is approved and merged to the main branch.
+  # infrastructure:
+  #   jobs:
+  #     - terraform/fmt:
+  #         checkout: true
+  #         context: terraform
+  #     - terraform/validate:
+  #         checkout: true
+  #         context: terraform
+  #         requires:
+  #           - terraform/fmt
+  #     - terraform/plan:
+  #         checkout: true
+  #         context: terraform
+  #         persist-workspace: true
+  #         requires:
+  #           - terraform/validate
+  #     - terraform/apply:
+  #         attach-workspace: true
+  #         context: terraform
+  #         filters:
+  #           branches:
+  #             only: main
+  #         requires:
+  #           - terraform/plan
