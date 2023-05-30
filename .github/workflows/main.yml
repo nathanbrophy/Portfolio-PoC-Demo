@@ -17,4 +17,6 @@ jobs:
     steps:
     - name: 'lint terraform'
       run: |
+        pwd
+        ls
         ./infrastructure/aws/lint
