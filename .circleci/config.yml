@@ -2,29 +2,16 @@
 # See: https://circleci.com/docs/configuration-reference
 version: 2.1
 
-# Define a job to be invoked later in a workflow.
-# See: https://circleci.com/docs/configuration-reference/#jobs
-# jobs:
-#   lint:
-#     # Specify the execution environment. You can specify an image from Docker Hub or use one of our convenience images from CircleCI's Developer Hub.
-#     # See: https://circleci.com/docs/configuration-reference/#executor-job
-#     docker:
-#       - image: cimg/base:stable
-#     # Add steps to the job
-#     # See: https://circleci.com/docs/configuration-reference/#steps
-#     steps:
-#       - checkout
-#       - run:
-#           name: "run lint action"
-#           command: "./infrastructure/aws/lint"
-
 orbs:
   terraform: circleci/terraform@3.2
   
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
 workflows:
-  lint-infrastructure:
+  # Workflow definition to fmt, validate and plan the TF release per commit.
+  # The manually approval flow for the build here is carried by only allowing
+  # the apply to be ran when the PR is approved and merged to the main branch.
+  infrastructure:
     jobs:
       - terraform/fmt:
           checkout: true
@@ -34,3 +21,17 @@ workflows:
           context: terraform
           requires:
             - terraform/fmt
+      - terraform/plan:
+          checkout: true
+          context: terraform
+          persist-workspace: true
+          requires:
+            - terraform/validate
+      - terraform/apply:
+          attach-workspace: true
+          context: terraform
+          filters:
+            branches:
+              only: main
+          requires:
+            - terraform/plan
