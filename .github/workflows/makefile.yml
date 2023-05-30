@@ -16,7 +16,7 @@ jobs:
     - name: terraform init
       run: |
         cd ./infrastructure/aws 
-        ./lint
+        terraform init
 
     - name: terraform lint
       run: |
