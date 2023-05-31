@@ -25,7 +25,7 @@ jobs:
           uses: docker/build-push-action@v4
           with:
             push: true
-            tags: "registry.hub.docker.com/nathanbrophy/example-controller:v1.0.0"
+            tags: nathanbrophy/example-controller:v1.0.0
             context: "./k8s"
             file: "./k8s/Dockerfile"
     build_and_push_server:
@@ -48,6 +48,6 @@ jobs:
                 uses: docker/build-push-action@v4
                 with:
                   push: true
-                  tags: "registry.hub.docker.com/nathanbrophy/example-server:v1.0.0"
+                  tags: nathanbrophy/example-server:v1.0.0
                   context: "./server"
                   file: "./server/Dockerfile"
