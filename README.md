@@ -91,8 +91,8 @@ $ helm upgrade pocsample operator-controller \
 
 | Requisite | Version (tested) | Reason |
 | :-------- | :--------------- | :----- |
-| `docker` | `20.10.14` | To build and push container images on change, Docker is needed.  If running PoC with `.deploy.no_build` set, this can be ignored. |
-| `go` | `1.20.4` | Required to build binaries from source and perform testing, if running PoC with `.deploy.no_build` set, this can be ignored. |
+| `docker` | `20.10.14` | To build and push container images on change, Docker is needed. |
+| `go` | `1.20.4` | Required to build binaries from source and perform testing. |
 | `minikube` | `v1.30.1` | This is only required for local development testing of the k8s controller. |
 | `terraform` | `1.4.6` | Required to provision the AWS environment in the public cloud. |
 
@@ -194,6 +194,12 @@ This step will create the k8s Operator controller to watch and manage the CRD in
 ### Verifying the Install
 
 The provided [verify_e2e.sh](./verify_e2e.sh) script can be used to verify the deployed environment. The load balancer install option is optional, and in the absence of the load balancer, the verify script will port forward the Pod's running port and verify from there.
+
+```sh
+$ ./verify_e2e.sh \
+      --controller-namespace ${controller_ns} \
+      --application-namespace ${app_ns}
+```
 
 ## Tearing Down the PoC
 

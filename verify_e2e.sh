@@ -1,58 +1,117 @@
 #!/usr/bin/env bash
 
+#
+# Vars
+#
+_NS="default"
+CONTROLLER_NS=
+APP_NS=
+
 function fail {
     echo "[FAIL]"
     exit 1
 }
 
-# Verify cluster connection
-echo "Veriying cluster connection"
+function help {
+    echo "Usage: $(basename ${BASH_SOURCE}) --controller-namespace STR --application-namespace STR"
+    echo ""
+    echo "Arguments:"
+    echo ""
+    echo "Flags:"
+    echo "--controller-namespace     the namespace the controller is running in"
+    echo "--application-namespace    the namespace the application is running in"
+    echo ""
+}
 
-kubectl cluster-info > /dev/null || fail
+function e2e {
+    # Verify cluster connection
+    echo "Veriying cluster connection"
 
-echo "[PASS]"
+    kubectl cluster-info > /dev/null || fail
 
-# Verify CRDs are present
+    echo "[PASS]"
 
-echo "Verify CRDs are present"
+    # Verify CRDs are present
 
-kubectl get crd applications.acme.io > /dev/null || fail
+    echo "Verify CRDs are present"
 
-echo "[PASS]"
+    kubectl get crd applications.acme.io > /dev/null || fail
 
-# Verify controller running
+    echo "[PASS]"
 
-echo "Verify controller running"
+    # Verify controller running
 
-kubectl -n acme-portfolio-example-manager get po -l control-plane=controller-manager | grep Running > /dev/null || fail
+    echo "Verify controller running"
 
-echo "[PASS]"
+    kubectl -n ${CONTROLLER_NS} get po -l control-plane=controller-manager | grep Running > /dev/null || fail
 
-# Verify application is running
+    echo "[PASS]"
 
-echo "Verify application is running"
+    # Verify application is running
 
-kubectl get po -l app=acme-application | grep Running > /dev/null || fail
+    echo "Verify application is running"
 
-echo "[PASS]"
+    kubectl -n ${APP_NS} get po -l app=acme-application | grep Running > /dev/null || fail
 
-# Verify application is working
+    echo "[PASS]"
 
-echo "Verify application is working"
+    # Verify application is working
 
-url="localhost:8081/example"
-# Check for load balancer in cluster env
-lb=$(kubectl get ing acme-application -o yaml | yq -Mr '.status.loadBalancer.ingress[].hostname')
-if [[ ! -z $lb ]]; then 
-    url="${lb}:80/example"
-else 
-    # Begin the port forward 
-    kubectl port-forward service/acme-application 8081:8081 > /dev/null &
+    echo "Verify application is working"
+
+    url="localhost:8081/example"
+    # Check for load balancer in cluster env
+    lb=$(kubectl -n ${APP_NS} get ing acme-application -o yaml | yq -Mr '.status.loadBalancer.ingress[].hostname')
+    if [[ ! -z $lb ]] && [[ "${lb}" != "" ]]; then 
+        url="${lb}:80/example"
+    else 
+        # Begin the port forward 
+        kubectl -n ${APP_NS} port-forward service/acme-application 8081:8081 > /dev/null &
     PID=$!
+    fi
+
+    curl "${url}" | grep Automate || fail
+
+    if [[ ! -z $PID ]]; then kill -9 $PID; fi
+
+    echo "[PASS]"
+}
+
+#
+# Main
+#
+while [ -n "${1}" ]; do
+    case "${1}" in
+        --controller-namespace)
+        shift
+        CONTROLLER_NS="${1}"
+        shift
+        ;;
+        --application-namespace)
+        shift
+        APP_NS="${1}"
+        shift
+        ;;
+        -h|--help)
+        help
+        exit 0
+        ;;
+        *)
+        echo "[ERRO] ${1} is not a supported flag"
+        help
+        exit 1
+        ;;
+    esac
+done
+
+if [[ -z "${CONTROLLER_NS}" ]]; then 
+    echo "[WARN] --controller-namespace not provided, using default namespace"
+    CONTROLLER_NS="${_NS}"
 fi
 
-curl "${url}" | grep Automate || fail
+if [[ -z "${APP_NS}" ]]; then 
+    echo "[WARN] --application-namespace not provided, using default namespace"
+    APP_NS="${_NS}"
+fi
 
-if [[ ! -z $PID ]]; then kill -9 $PID; fi
-
-echo "[PASS]"
+e2e
