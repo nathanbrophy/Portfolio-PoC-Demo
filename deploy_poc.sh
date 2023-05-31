@@ -117,6 +117,8 @@ function run {
     context_namespace
     controller
 
+    sleep 10s
+    
     display_rest_endpoint_with_sample
 }
 
