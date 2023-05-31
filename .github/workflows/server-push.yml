@@ -8,10 +8,10 @@ jobs:
     build_and_push:
         runs-on: ubuntu-latest
         env:
-            # Version is hard coded at the moment, in the future we should
+            # IMG is hard coded at the moment, in the future we should
             # use git API to dynamically get the latest tag ref to auto tag the
             # image.
-            version: "v1.0.0"
+            IMG: registry.hub.docker.com/nathanbrophy/example-server:v1.0.0"
             DOCKER_ID: ${{ secrets.DOCKER_ID }}
             DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
             RUN_SERVER_TESTS: false
@@ -21,5 +21,5 @@ jobs:
           run: |
             cd server 
             printf ${DOCKER_PASS} | docker login -u ${DOCKER_ID} --password-stdin 
-            make docker-build VERSION=${version}
-            make docker-push VERSION=${version}
+            docker build -f Dockerfile -t ${IMG} . 
+            docker push ${IMG}

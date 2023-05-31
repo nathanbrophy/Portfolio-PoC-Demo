@@ -2,7 +2,8 @@ name: Infrastructure Pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    # TODO: change back to main once docker build issues are worked out 
+    branches: [ "not-a-branch" ]
 
 jobs:
   infrastructure-apply:
@@ -10,16 +11,20 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       region: "us-west-1"
-      cluster_name: "exampleClusterDevNathan2023"
+      cluster_name: "pocExampleClusterDevNathan20230530"
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
 
-    - name: terraform apply
+    - name: terraform init
       run: |
         cd ./infrastructure/aws 
         terraform init
+
+    - name: terraform apply
+      run: |
+        cd ./infrastructure/aws 
         terraform apply -var region="${region}" -var cluster_name="${cluster_name}" -auto-approve 
   
 

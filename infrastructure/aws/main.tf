@@ -3,6 +3,18 @@ provider "aws" {
     region = var.region
 }
 
+provider "helm" {
+  kubernetes {
+    host = module.eks.cluster_endpoint
+    cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
+    exec {
+      api_version = "client.authentication.k8s.io/v1beta1"
+      args        = ["eks", "get-token", "--cluster-name", var.cluster_name]
+      command     = "aws"
+    }
+  }
+}
+
 # Dynamically load the availability zone data
 # from the specified var.region value. 
 #
@@ -80,7 +92,7 @@ module "eks" {
 # Required for Ingress to function
 # with the OIDC provider on the cluster
 resource "aws_iam_policy" "policy" {
-    name = "ingress_policy"
+    name = var.iam_policy_name
     description = "policy for the ingress ALB controller"
     policy = <<EOT
 {
@@ -325,4 +337,87 @@ resource "aws_iam_policy" "policy" {
     ]
 }
 EOT
+}
+
+data "aws_caller_identity" "current" {}
+
+resource "aws_iam_role" "ingress_alb_controller" {
+    name = var.iam_policy_name
+
+    force_detach_policies = true
+
+    assume_role_policy = <<EOT
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Federated": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${module.eks.oidc_provider}"
+            },
+            "Action": "sts:AssumeRoleWithWebIdentity",
+            "Condition": {
+                "StringEquals": {
+                    "${module.eks.oidc_provider}:aud": "sts.amazonaws.com",
+                    "${module.eks.oidc_provider}:sub": "system:serviceaccount:kube-system:aws-load-balancer-controller"
+                }
+            }
+        }
+    ]
+}
+EOT
+    
+    
+    tags = {
+        "alpha.eksctl.io/cluster-name" = var.cluster_name,
+        "eksctl.cluster.k8s.io/v1alpha1/cluster-name" = var.cluster_name,
+        "alpha.eksctl.io/iamserviceaccount-name" = "kube-system/aws-load-balancer-controller",
+    }
+}
+
+resource "aws_iam_role_policy_attachment" "load-balancer-attach" {
+  role       = aws_iam_role.ingress_alb_controller.name
+  policy_arn = aws_iam_policy.policy.arn
+}
+
+resource "helm_release" "jetstack" {
+  name       = "jetstack"
+
+  repository = "https://charts.jetstack.io"
+  chart      = "cert-manager"
+  create_namespace = true
+  namespace = "cert-manager"
+
+  set {
+    name = "installCRDs"
+    value = "true"
+  }
+}
+
+resource "helm_release" "aws-load-balancer-controller" {
+  name       = "eks"
+
+  repository = "https://aws.github.io/eks-charts"
+  chart      = "aws-load-balancer-controller"
+  namespace = "kube-system"
+
+  set {
+    name = "clusterName"
+    value = module.eks.cluster_name
+  }
+
+  set {
+    name = "serviceAccount.create"
+    value = "true"
+  }
+
+  set {
+    name = "serviceAccount.name"
+    value = "aws-load-balancer-controller"
+  }
+
+  set {
+    name = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+    value = "arn:aws:iam::901943312319:role/${var.iam_policy_name}"
+  }
 }

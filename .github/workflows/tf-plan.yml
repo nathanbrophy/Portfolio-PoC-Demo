@@ -1,8 +1,6 @@
 name: Infrastructure Pipeline
 
 on:
-  push:
-    branches: [ '!main', '*' ]
   pull_request:
     branches: [ "main" ]
 
@@ -29,7 +27,7 @@ jobs:
     - name: terraform plan
       env:
         region: "us-west-1"
-        cluster_name: "exampleClusterDevNathan2023"
+        cluster_name: "pocExampleClusterDevNathan20230530"
       run: |
         cd ./infrastructure/aws 
         terraform plan -no-color -var region="${region}" -var cluster_name="${cluster_name}"
