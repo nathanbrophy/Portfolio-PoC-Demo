@@ -26,3 +26,5 @@ jobs:
           with:
             push: true
             tags: "registry.hub.docker.com/nathanbrophy/example-controller:v1.0.0"
+            context: "./k8s"
+            file: "./k8s/Dockerfile"
