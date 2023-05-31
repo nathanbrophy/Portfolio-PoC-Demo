@@ -7,10 +7,14 @@ provider "helm" {
   kubernetes {
     # host = module.eks.cluster_endpoint
     # cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
+
+    config_paths = [
+      "./.kubeconfig",
+    ]
     
     exec {
       api_version = "client.authentication.k8s.io/v1beta1"
-      args        = ["eks", "--region", var.region, "update-kubeconfig", "--name", var.cluster_name]
+      args        = ["eks", "--region", var.region, "update-kubeconfig", "--name", var.cluster_name, "--kubeconfig", "./.kubeconfig"]
       command     = "aws"
       env = {
         AWS_ACCESS_KEY_ID = "AWS_ACCESS_KEY_ID",
