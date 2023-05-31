@@ -395,6 +395,11 @@ resource "helm_release" "jetstack" {
     name = "installCRDs"
     value = "true"
   }
+
+  depends_on = [ 
+        module.eks,
+        module.vpc
+   ]
 }
 
 resource "helm_release" "aws-load-balancer-controller" {
@@ -423,4 +428,9 @@ resource "helm_release" "aws-load-balancer-controller" {
     name = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
     value = "arn:aws:iam::901943312319:role/${var.iam_role_name}"
   }
+
+  depends_on = [ 
+        module.eks,
+        module.vpc
+   ]
 }
