@@ -2,16 +2,15 @@ name: Infrastructure Pipeline
 
 on:
   push:
-    # TODO: change back to main once docker build issues are worked out 
-    branches: [ "not-a-branch" ]
+    branches: [ "main" ]
 
 jobs:
   infrastructure-apply:
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      region: "us-west-1"
-      cluster_name: "pocExampleClusterDevNathan20230530"
+      region: ${{ vars.REGION }}
+      cluster_name: ${{ vars.CLUSTER_NAME }}
     runs-on: ubuntu-latest
 
     steps:
