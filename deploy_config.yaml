@@ -11,5 +11,5 @@ deploy:
     repository: "nathanbrophy/example-controller"
     tag: "v1.0.0"
   terraform: 
-    cluster_name: "exampleCluster20230528567"
+    cluster_name: "pocClusterDeploy20230530"
     region: "us-west-1"
