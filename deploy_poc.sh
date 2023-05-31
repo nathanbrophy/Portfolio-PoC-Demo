@@ -85,14 +85,12 @@ function run {
     configure_cluster_credentials
     context_namespace
     controller
-
-    # TODO: replace this with a until do loop in display REST information
-    sleep 30s
-    
-    display_rest_endpoint_with_sample
 }
 
 run
 
-# Verify the install was successfule
+# Give the env time to come online before running the verify script
+sleep 60
+
+# Verify the install was successful
 source ./verify_e2e.sh 
