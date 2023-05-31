@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "operator-controller.fullname" . }}-test-connection"
+  labels:
+    {{- include "operator-controller.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+  namespace: {{ .Release.Namespace }}
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ .Values.cr.namespace }}.{{ .Values.cr.name }}.svc.cluster.local:8081']
+  restartPolicy: Never

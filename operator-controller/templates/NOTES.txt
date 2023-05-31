@@ -1,0 +1,1 @@
+Application installed to the {{ .Values.cr.namespace.name }} namespace.

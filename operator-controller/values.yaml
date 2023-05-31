@@ -1,0 +1,10 @@
+# Default values for operator-controller.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+image: "registry.hub.docker.com/nathanbrophy/example-controller:v1.0.0"
+cr:
+  namespace: 
+    create: true
+    name: sample-ns
+  name: sample
+  image: "registry.hub.docker.com/nathanbrophy/example-server:v1.0.0"
