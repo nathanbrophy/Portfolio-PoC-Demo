@@ -95,7 +95,7 @@ provider "helm" {
 # Required for Ingress to function
 # with the OIDC provider on the cluster
 resource "aws_iam_policy" "policy" {
-    name = var.iam_role_name
+    name = var.iam_policy_name
     description = "policy for the ingress ALB controller"
     policy = <<EOT
 {
@@ -345,7 +345,7 @@ EOT
 data "aws_caller_identity" "current" {}
 
 resource "aws_iam_role" "ingress_alb_controller" {
-    name = var.iam_policy_name
+    name = var.iam_role_name
 
     force_detach_policies = true
 
