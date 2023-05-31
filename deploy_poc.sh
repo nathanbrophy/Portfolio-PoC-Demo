@@ -117,7 +117,8 @@ function run {
     context_namespace
     controller
 
-    sleep 10s
+    # TODO: replace this with a until do loop in display REST information
+    sleep 30s
     
     display_rest_endpoint_with_sample
 }

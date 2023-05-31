@@ -77,10 +77,7 @@ module "eks" {
     }
 }
 
-# data "aws_eks_cluster" "eks-1" {
-#   name = var.cluster_name
-# }
-
+# Dynamicaly load the cluster auth information
 data "aws_eks_cluster_auth" "eks-1" {
   name = var.cluster_name
 }
@@ -98,7 +95,7 @@ provider "helm" {
 # Required for Ingress to function
 # with the OIDC provider on the cluster
 resource "aws_iam_policy" "policy" {
-    name = var.iam_policy_name
+    name = var.iam_role_name
     description = "policy for the ingress ALB controller"
     policy = <<EOT
 {
@@ -424,6 +421,6 @@ resource "helm_release" "aws-load-balancer-controller" {
 
   set {
     name = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
-    value = "arn:aws:iam::901943312319:role/${var.iam_policy_name}"
+    value = "arn:aws:iam::901943312319:role/${var.iam_role_name}"
   }
 }
