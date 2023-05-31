@@ -38,38 +38,7 @@ function check_prereqs {
 function controller {
     info "building and deploying controller to remote registry"
 
-    local image_registry="$(cat deploy_config.yaml | yq -Mr '.deploy.registry')"
-    local image_repository="$(cat deploy_config.yaml | yq -Mr '.deploy.controller.repository')"
-    local image_tag="$(cat deploy_config.yaml | yq -Mr '.deploy.controller.tag')"
-    local image="${image_registry}/${image_repository}:${image_tag}"
-    local server_tag="$(cat deploy_config.yaml | yq -Mr '.deploy.server.tag') "
-    local server_repository="$(cat deploy_config.yaml | yq -Mr '.deploy.server.repository')"
-    local server_image="${image_registry}/${server_repository}:${server_tag}"
-    server_image="$(printf ${server_image} | tr -d ' ')"
-
-    cd k8s
-
-    info "installing CRDs to cluster"
-
-    make install
-
-    info "deploying controller to environment"
-
-    kubectl kustomize config/default | sed "s%REPLACE_IMAGE%${image}%g" | kubectl apply -f -
-
-    info "create the CR to deploy the application to the environment"
-
-    kubectl apply -f - <<EOF
-apiVersion: acme.io/v1beta1
-kind: Application
-metadata:
-  name: application-sample
-spec:
-  application:
-    image: "${server_image}"
-    port: 8081
-
-EOF
+    helm upgrade -i operatorsample operator-controller --namespace acme-controller-manager --create-namespace 
 
     cd "${ROOT_DIR}"
 }

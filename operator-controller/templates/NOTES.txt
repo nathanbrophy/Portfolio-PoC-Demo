@@ -1,1 +1,7 @@
 Application installed to the {{ .Values.cr.namespace.name }} namespace.
+
+Please run the following to access the REST server at the defined host:
+    host="$(kubectl get ing acme-application -n {{ .Values.cr.namespace.name }} -o yaml | yq -Mr '.status.loadBalancer.ingress[].hostname')"
+
+Then you can access the REST server at the following URL:
+    curl "${host}:80/example"
