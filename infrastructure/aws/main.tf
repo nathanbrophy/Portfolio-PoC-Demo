@@ -3,27 +3,6 @@ provider "aws" {
     region = var.region
 }
 
-provider "helm" {
-  kubernetes {
-    # host = module.eks.cluster_endpoint
-    # cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
-
-    config_paths = [
-      "./.kubeconfig",
-    ]
-    
-    exec {
-      api_version = "client.authentication.k8s.io/v1beta1"
-      args        = ["eks", "--region", var.region, "update-kubeconfig", "--name", var.cluster_name, "--kubeconfig", "./.kubeconfig"]
-      command     = "aws"
-      env = {
-        AWS_ACCESS_KEY_ID = "AWS_ACCESS_KEY_ID",
-        AWS_SECRET_ACCESS_KEY = "AWS_SECRET_ACCESS_KEY"
-      }
-    }
-  }
-}
-
 # Dynamically load the availability zone data
 # from the specified var.region value. 
 #
@@ -97,6 +76,24 @@ module "eks" {
         }
     }
 }
+
+# data "aws_eks_cluster" "eks-1" {
+#   name = var.cluster_name
+# }
+
+data "aws_eks_cluster_auth" "eks-1" {
+  name = var.cluster_name
+}
+
+provider "helm" {
+  kubernetes {
+    host = module.eks.cluster_endpoint
+    cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
+    token = data.aws_eks_cluster_auth.eks-1.token
+  }
+}
+
+
 
 # Required for Ingress to function
 # with the OIDC provider on the cluster
