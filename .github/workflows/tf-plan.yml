@@ -9,6 +9,8 @@ jobs:
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      region: ${{ vars.REGION }}
+      cluster_name: ${{ vars.CLUSTER_NAME }}
     runs-on: ubuntu-latest
 
     steps:
@@ -25,9 +27,6 @@ jobs:
         ./lint
     
     - name: terraform plan
-      env:
-        region: "us-west-1"
-        cluster_name: "pocExampleClusterDevNathan20230530"
       run: |
         cd ./infrastructure/aws 
         terraform plan -no-color -var region="${region}" -var cluster_name="${cluster_name}"
