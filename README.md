@@ -200,27 +200,33 @@ The provided [verify_e2e.sh](./verify_e2e.sh) script can be used to verify the d
 To tear down the PoC the following can be run:
 
 ```sh
+##########################
+#                        #
+# Uninstall the PoC Only #
+#                        #
+##########################
+
 # The application must be deleted to cascade the deletion of cluster resources
 # the load balancer in the AWS env must be deleted or it can cause 
 # the subnet finalizers to not resolve properly resulting in orphaned resources. 
 $ helm uninstall pocsample -n acme-controller-manager
 
-# If the load balancer was deployed then the ingress must
-# be cleaned up on the cluster, otherwise the VPCs will 
-# block deletion until the load balancer is manually deleted from
-# the AWS env
-#
-# Note: if this command does not terminate properly and the finalizer
-# is removed or the resource if force deleted, then this can cause the 
-# load balancer to be orphaned and require manual deletion
-$ kubectl delete ing application-sample -n sample-ns
+####################
+#                  #
+# Teardown the Env #
+#                  #
+####################
 
 # The IAM policy binding MAY need to be cleaned up
 # before running the terraform destroy as in some
 # cases there can be a delete conflict returned 
 # by the AWS server when removing the resources
-$ aws iam delete-role --role-name=ingress_alb_controller
-$ aws iam delete-policy --policy-arn=$(aws iam list-policies --no-cli-pager --output yaml | yq -Mr '.Policies[] | select(.PolicyName == "ingress_policy") | .Arn')
+#
+# TODO(any): we can exec this in the terraform and put a dependend on 
+#            statement in the iam role clause for the cleanup of the attachment
+$ aws iam detach-role-policy \
+   --role-name=ingress_alb_controller \
+   --policy-arn=$(aws iam list-policies --no-cli-pager --output yaml | yq -Mr '.Policies[] | select(.PolicyName == "ingress_policy") | .Arn')
 
 # The following commands will remove the infrastructure
 # provisioned in the PoC
