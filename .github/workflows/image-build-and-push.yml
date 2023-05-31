@@ -48,6 +48,6 @@ jobs:
                 uses: docker/build-push-action@v4
                 with:
                   push: true
-                  tags: nathanbrophy/example-server:v1.0.0
+                  tags: nathanbrophy/example-server:v1.0.1
                   context: "./server"
                   file: "./server/Dockerfile"
