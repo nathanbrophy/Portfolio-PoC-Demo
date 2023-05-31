@@ -9,8 +9,8 @@ jobs:
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      region: "us-west-1"
-      cluster_name: "pocClusterDeploy20230530"
+      region: ${{ vars.REGION }}
+      cluster_name: ${{ vars.CLUSTER_NAME }}
     runs-on: ubuntu-latest
 
     steps:
