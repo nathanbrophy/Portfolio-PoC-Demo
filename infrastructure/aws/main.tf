@@ -11,6 +11,10 @@ provider "helm" {
       api_version = "client.authentication.k8s.io/v1beta1"
       args        = ["eks", "--region", var.region, "update-kubeconfig", "--name", var.cluster_name]
       command     = "aws"
+      env = {
+        AWS_ACCESS_KEY_ID = "AWS_ACCESS_KEY_ID",
+        AWS_SECRET_ACCESS_KEY = "AWS_SECRET_ACCESS_KEY"
+      }
     }
   }
 }
