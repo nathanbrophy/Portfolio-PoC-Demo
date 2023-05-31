@@ -2,8 +2,7 @@ name: Infrastructure Pipeline
 
 on:
   push:
-    # TODO: change back to main once docker build issues are worked out 
-    branches: [ "not-a-branch" ]
+    branches: [ "main" ]
 
 jobs:
   infrastructure-apply:

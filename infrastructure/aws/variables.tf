@@ -7,7 +7,7 @@ variable "region" {
 variable "cluster_name" {
     description = "Cluster Name"
     type        = string
-    default     = "helmApplyTF"
+    default     = "pocClusterDeploy20230530"
 }
 
 variable "cluster_version" {
