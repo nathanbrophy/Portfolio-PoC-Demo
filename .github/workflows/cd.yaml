@@ -14,14 +14,12 @@ jobs:
         runs-on: ubuntu-latest
         steps:
         - uses: actions/checkout@v3
-
         - name: terraform init
           run: |
             cd ./infrastructure/aws 
             terraform init
-
-            - name: terraform apply
-            run: |
+        - name: terraform apply
+          run: |
             cd ./infrastructure/aws 
             terraform apply -var region="${region}" -var cluster_name="${cluster_name}" -auto-approve 
     build_and_push_controller:
