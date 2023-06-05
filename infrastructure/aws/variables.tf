@@ -34,14 +34,14 @@ variable "public_subnets" {
     default     = ["10.0.3.0/24", "10.0.4.0/24"]
 }
 
-variable "iam_policy_name" {
-    description = "IAM policy name"
-    type        = string
-    default     = "ingress_policy"
-}
+# variable "iam_policy_name" {
+#     description = "IAM policy name"
+#     type        = string
+#     default     = "ingress_policy"
+# }
 
-variable "iam_role_name" {
-    description = "IAM role name"
-    type        = string
-    default     = "ingress_alb_controller"
-}
+# variable "iam_role_name" {
+#     description = "IAM role name"
+#     type        = string
+#     default     = "ingress_alb_controller"
+# }
