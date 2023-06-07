@@ -42,7 +42,7 @@ jobs:
           uses: docker/build-push-action@v4
           with:
             push: true
-            tags: ${{ vars.CONTROLLER_TAG }}
+            tags: "nathanbrophy/example-controller:${{ github.sha }}"
             context: "./k8s"
             file: "./k8s/Dockerfile"
     build_and_push_server:
@@ -65,7 +65,7 @@ jobs:
           uses: docker/build-push-action@v4
           with:
             push: true
-            tags: ${{ vars.APPLICATION_TAG }}
+            tags: "nathanbrophy/example-server:${{ github.sha }}"
             context: "./server"
             file: "./server/Dockerfile"
     deploy_application_to_env:
@@ -90,4 +90,5 @@ jobs:
                     -i \
                     --namespace acme-controller-manager \
                     --create-namespace \
+                    --set cr.image="registry.hub.docker.com/nathanbrophy/example-server:${{ github.sha }}"
         
