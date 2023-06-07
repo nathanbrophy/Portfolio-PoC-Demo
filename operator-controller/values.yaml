@@ -7,4 +7,4 @@ cr:
     create: true
     name: sample-ns
   name: sample
-  image: "registry.hub.docker.com/nathanbrophy/example-server:v1.0.1"
+  image: "registry.hub.docker.com/nathanbrophy/example-server:v1.0.2"
