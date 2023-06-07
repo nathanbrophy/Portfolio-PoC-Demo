@@ -90,5 +90,7 @@ jobs:
                     -i \
                     --namespace acme-controller-manager \
                     --create-namespace \
-                    --set cr.image="registry.hub.docker.com/nathanbrophy/example-server:${{ github.sha }}"
+                    -f operator-controller/values.yaml
+                    --set cr.image="registry.hub.docker.com/nathanbrophy/example-server:${{ github.sha }}" \
+                    --set cr.image="registry.hub.docker.com/nathanbrophy/example-controller:${{ github.sha }}"
         
