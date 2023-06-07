@@ -90,6 +90,4 @@ jobs:
                     -i \
                     --namespace acme-controller-manager \
                     --create-namespace \
-                    --set image=${{ vars.CONTROLLER_TAG }} \
-                    --set cr.iamge=${{ vars.APPLICATION_TAG }}
         

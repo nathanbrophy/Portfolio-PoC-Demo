@@ -13,3 +13,4 @@ spec:
   application:
     image: {{ .Values.cr.image }}
     port: 8081
+    replicas: 3
