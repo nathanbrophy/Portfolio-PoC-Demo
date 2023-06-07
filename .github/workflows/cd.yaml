@@ -93,5 +93,5 @@ jobs:
                     --create-namespace \
                     -f operator-controller/values.yaml \
                     --set cr.image="registry.hub.docker.com/nathanbrophy/example-server:${{ github.sha }}" \
-                    --set cr.image="registry.hub.docker.com/nathanbrophy/example-controller:${{ github.sha }}"
+                    --set image="registry.hub.docker.com/nathanbrophy/example-controller:${{ github.sha }}"
         
